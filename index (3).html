@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osborne Farm Conservation Easements Information Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: white;
+            color: #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .property-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .property-card.active {
+            display: block;
+        }
+        .property-header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .property-header h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .property-header .lot-info {
+            color: #666;
+            font-size: 14px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .section h3 {
+            color: #667eea;
+            margin: 15px 0 10px 0;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 10px 0;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        .info-item label {
+            display: block;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-item p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .list-section ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        .list-section li {
+            margin-bottom: 8px;
+        }
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: #856404;
+        }
+        .alert.critical {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .alert h4 {
+            margin-bottom: 5px;
+        }
+        .monitoring-checklist {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            margin: 12px 0;
+        }
+        .checklist-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 4px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .checklist-item label {
+            cursor: pointer;
+            flex: 1;
+            color: #555;
+        }
+        .map-container {
+            margin: 20px 0;
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .coordinates {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .ownership-note {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+        .template-info {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: #004a99;
+        }
+        .template-info h4 {
+            margin-bottom: 8px;
+        }
+        .share-section {
+            background: #f0f7ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .share-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .share-btn-copy {
+            background: #667eea;
+            color: white;
+        }
+        .share-btn-copy:hover {
+            background: #5568d3;
+        }
+        .share-btn-print {
+            background: #28a745;
+            color: white;
+        }
+        .share-btn-print:hover {
+            background: #218838;
+        }
+        .map-embed {
+            width: 100%;
+            height: 400px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+        }
+        .coordinates-display {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .tabs {
+                display: none;
+            }
+        }
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏞️ Osborne Farm Conservation Easements Information Summary</h1>
+            <p>Seasonal Monitoring Guide for Land Trust Monitors | Philipstown, Putnam County, NY</p>
+            <p style="margin-top: 10px; font-style: italic;">Old Osborn Farm - Former Farm Complex with Multiple Parcels under ATC Easement</p>
+            <div class="share-section">
+                <strong>Share This Guide - Best Options for Teams:</strong>
+                <div class="share-buttons">
+                    <button class="share-btn share-btn-print" onclick="window.print()">🖨️ Print/PDF</button>
+                    <button class="share-btn share-btn-copy" onclick="shareAsFile()">📥 Download HTML</button>
+                    <button class="share-btn share-btn-copy" onclick="showHostingGuide()">🌐 Sharing & Hosting Guide</button>
+                </div>
+                <p style="font-size: 12px; margin-top: 10px; color: #666;">✓ Download HTML to share via email | ✓ Print to PDF for field use | ✓ Host online for team access</p>
+            </div>
+            <div id="hostingGuide" style="display: none; background: #e8f4f8; border-left: 4px solid #0066cc; padding: 15px; border-radius: 4px; margin: 15px 0; color: #004a99; font-size: 13px;">
+                <h4 style="margin-bottom: 10px;">📤 SHARING WITH COWORKERS & MONITORS:</h4>
+                
+                <div style="margin: 15px 0; background: white; padding: 12px; border-radius: 4px; border: 1px solid #0066cc;">
+                    <h5 style="margin: 10px 0 5px 0; color: #004a99;">1️⃣ EASIEST - Email the HTML File</h5>
+                    <p style="margin: 5px 0;"><strong>✓ Best for:</strong> Small teams, immediate access, no setup needed</p>
+                    <p style="margin: 5px 0;"><strong>How:</strong></p>
+                    <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                        <li>Click "Download HTML" button above</li>
+                        <li>Attach file to email (only ~200KB)</li>
+                        <li>Recipients double-click file to open in browser - everything works perfectly</li>
+                        <li>No internet connection needed to use it</li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;">Perfect for monitors in the field or sharing with ATC</p>
+                </div>
+
+                <div style="margin: 15px 0; background: white; padding: 12px; border-radius: 4px; border: 1px solid #0066cc;">
+                    <h5 style="margin: 10px 0 5px 0; color: #004a99;">2️⃣ BEST FOR TEAM - Google Drive Shared Folder</h5>
+                    <p style="margin: 5px 0;"><strong>✓ Best for:</strong> Teams that collaborate, shared access, version control</p>
+                    <p style="margin: 5px 0;"><strong>How:</strong></p>
+                    <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                        <li>Download HTML file above</li>
+                        <li>Upload to Google Drive shared folder (e.g., "ATC-Monitoring-2025")</li>
+                        <li>Share folder link with team: "Anyone with link can view"</li>
+                        <li>Team members download file to use locally, OR</li>
+                        <li>Right-click file → "Open with" → Google Chrome (opens directly in Drive)</li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;">Keeps all versions organized, everyone sees updates</p>
+                </div>
+
+                <div style="margin: 15px 0; background: white; padding: 12px; border-radius: 4px; border: 1px solid #0066cc;">
+                    <h5 style="margin: 10px 0 5px 0; color: #004a99;">3️⃣ ADVANCED - Netlify Drop (Instant Live Link)</h5>
+                    <p style="margin: 5px 0;"><strong>✓ Best for:</strong> Sharing a live link, no downloads needed, always current version</p>
+                    <p style="margin: 5px 0;"><strong>How:</strong></p>
+                    <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                        <li>Download HTML file above</li>
+                        <li>Go to <a href="https://app.netlify.com/drop" target="_blank" style="color: #0066cc; text-decoration: underline;">netlify.com/drop</a> (no login needed)</li>
+                        <li>Drag HTML file into browser → get instant live URL</li>
+                        <li>Share link with team (e.g., osborne-farm-12345.netlify.app)</li>
+                        <li>Anyone can access from any device - works on phones too</li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;">Great for mobile access in the field</p>
+                </div>
+
+                <div style="margin: 15px 0; background: white; padding: 12px; border-radius: 4px; border: 1px solid #0066cc;">
+                    <h5 style="margin: 10px 0 5px 0; color: #004a99;">4️⃣ MOST SECURE - GitHub Pages (Permanent)</h5>
+                    <p style="margin: 5px 0;"><strong>✓ Best for:</strong> Long-term, professional hosting, version history, multiple versions</p>
+                    <p style="margin: 5px 0;"><strong>How:</strong></p>
+                    <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                        <li>Create free GitHub account (github.com)</li>
+                        <li>Create repository: "osborne-farm-monitoring"</li>
+                        <li>Upload HTML file</li>
+                        <li>Enable GitHub Pages in Settings</li>
+                        <li>Get permanent URL: yourusername.github.io/osborne-farm-monitoring</li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;">Perfect for land trust archives - keeps version history</p>
+                </div>
+
+                <div style="background: #fff9e6; border: 1px solid #ffc107; padding: 12px; border-radius: 4px; margin-top: 15px;">
+                    <p style="margin: 5px 0;"><strong>📌 KEY POINT:</strong> All sharing options preserve 100% of functionality:</p>
+                    <ul style="margin: 8px 0 0 20px; font-size: 12px;">
+                        <li>✓ Tab switching between properties</li>
+                        <li>✓ Monitoring checklists (click to check off)</li>
+                        <li>✓ Google Maps embedded views</li>
+                        <li>✓ All formatting and colors</li>
+                        <li>✓ Print/PDF functionality</li>
+                    </ul>
+                </div>
+
+                <div style="background: #e8f8e8; border: 1px solid #28a745; padding: 12px; border-radius: 4px; margin-top: 15px;">
+                    <p style="margin: 0;"><strong>💡 FOR YOUR USE CASE:</strong> Email the HTML file to coworkers for immediate access. Use Google Drive for team coordination. Both keep it 100% functional.</p>
+                </div>
+            </div>
+
+
+        function showHostingGuide() {
+            const guide = document.getElementById('hostingGuide');
+            if (guide.style.display === 'none') {
+                guide.style.display = 'block';
+                document.querySelector('header').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                guide.style.display = 'none';
+            }
+        }
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchProperty(0)">Lot 65 - Evarts</button>
+            <button class="tab-btn" onclick="switchProperty(1)">Lot 66 - Barger</button>
+            <button class="tab-btn" onclick="switchProperty(2)">Lot 69 - Hilpert</button>
+            <button class="tab-btn" onclick="switchProperty(3)">Lot 70 - Kulleseid 2</button>
+            <button class="tab-btn" onclick="switchProperty(4)">Lot 71 - Kulleseid 1</button>
+            <button class="tab-btn" onclick="switchProperty(5)">Lot 72 - Clemente</button>
+            <button class="tab-btn" onclick="switchProperty(6)">Lot 73 - Cristiano</button>
+            <button class="tab-btn" onclick="switchProperty(7)">Lot 74 - Connolly</button>
+        </div>
+
+        <!-- LOT 65 - EVARTS -->
+        <div id="prop-0" class="property-card active">
+            <div class="property-header">
+                <h2>Lot 65 - Evarts Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-65 | Recorded: 11-7-1986 | Liber 918, Page 132</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Frederike Merck</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <p>assistant@friedrike.com<br/>GPS: N41 20.443 W73 55.877</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>31.6 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Access</label>
+                    <p>Via private driveway from NYS Route 9 through other easement parcels</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>GPS Coordinates & Property Map</h3>
+                <div class="coordinates-display">
+                    <strong>Central Property Point:</strong><br/>
+                    Latitude: N41 20.443 | Longitude: W73 55.877<br/>
+                    <strong>Google Maps:</strong> <a href="https://maps.google.com/?q=41.34072,-73.93128" target="_blank" style="color: #667eea;">Open in Google Maps</a>
+                </div>
+                <iframe class="map-embed" src="https://maps.google.com/maps?q=41.34072,-73.93128&z=16&output=embed" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+
+            <div class="section">
+                <h3>Land Composition</h3>
+                <ul>
+                    <li>77% hardwood forest</li>
+                    <li>12% open meadows/hay field</li>
+                    <li>9% pond (Lake Alice)</li>
+                    <li>2% wetland</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Structures & Features</h3>
+                <ul>
+                    <li>Wooden structure on pond shore (Lake Alice)</li>
+                    <li>Stone walls</li>
+                    <li>Old fence and abandoned farm implements</li>
+                    <li>Dirt foot trails and laneways</li>
+                    <li>Posted signs</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Easement Restrictions & Protected Values</h3>
+                <div class="restriction-box">
+                    <p><strong>Restricted Area:</strong> 96% of property lies within Restricted Area per deed and amended survey (12-22-2005 amendment)</p>
+                    <p><strong>Primary Protected Values:</strong> Forest and meadow ecosystem, Lake Alice pond and wetland habitat, scenic viewshed from Appalachian Trail and Hudson Highlands State Park</p>
+                    <p><strong>Landowner Reserved Rights:</strong> Reasonable recreational use, forestry operations (limited), agricultural use (hay cutting), maintenance of existing structures</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Detailed Reserved Rights</h3>
+                <div class="restriction-details">
+                    <h4>OWNER RETAINS:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Recreational Use:</strong> Personal, non-commercial recreation including hiking, picnicking, hunting (where permitted by NYS law), and fishing in Lake Alice</li>
+                        <li><strong>Agricultural Operations:</strong> Annual hay cutting in open meadows; limited pasture use with existing infrastructure only</li>
+                        <li><strong>Forestry Rights:</strong> Selective harvesting of trees for firewood and timber management; must maintain 80% forest canopy coverage in forested areas</li>
+                        <li><strong>Structure Maintenance:</strong> Repair and maintenance of existing wooden pond structure and stone walls; replacement in kind if necessary</li>
+                        <li><strong>Property Access:</strong> Full access rights for owner use via existing laneways and foot trails</li>
+                        <li><strong>Water Use:</strong> Limited domestic water use from Lake Alice for personal consumption only; not for commercial, agricultural, or industrial purposes</li>
+                        <li><strong>Estate Management:</strong> Owner can manage property for personal enjoyment, wildlife habitat enhancement, and conservation stewardship</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Prohibited Activities & Restrictions</h3>
+                <div class="restriction-details">
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Residential development:</strong> No new house sites or permanent dwellings</li>
+                        <li><strong>Commercial/industrial use:</strong> No commercial operations, mining, or extractive activities</li>
+                        <li><strong>Subdivisions:</strong> Property cannot be subdivided (except as allowed in deed)</li>
+                        <li><strong>Major alterations:</strong> No draining of wetlands, pond filling, or significant grading</li>
+                        <li><strong>Clearcutting:</strong> No clear-cut harvesting of forest; selective cutting only if permitted</li>
+                        <li><strong>Intensive agriculture:</strong> No row crops, pesticide-dependent uses, or monoculture farming</li>
+                        <li><strong>Unauthorized structures:</strong> No new buildings, roads, or substantial improvements outside building envelope</li>
+                        <li><strong>Dumping/waste:</strong> No disposal of solid waste, hazardous materials, or junked vehicles</li>
+                        <li><strong>Public access roads:</strong> No opening property to public use or recreational access</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Permitted Activities (With Restrictions)</h3>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li><strong>Hay cutting:</strong> Agricultural use limited to annual hay cutting - no grazing or intensive use</li>
+                    <li><strong>Forestry:</strong> Selective harvesting only; must maintain wildlife habitat and forest cover</li>
+                    <li><strong>Recreation:</strong> Personal, non-commercial recreation (hiking, hunting permitted where allowed by owner)</li>
+                    <li><strong>Maintenance:</strong> Upkeep of existing structures within building envelope boundaries</li>
+                    <li><strong>Estate management:</strong> Owner can maintain property for personal use/enjoyment</li>
+                </ul>
+            </div>
+
+            <div class="alert critical">
+                <h4>⚠️ Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Wooden structure condition on pond shore - verify no major modifications</li>
+                    <li>Pond water quality and ecological health (Lake Alice) - protected wetland habitat</li>
+                    <li>Verify hay field use is ongoing (permitted agricultural activity) - may appear fallow seasonally</li>
+                    <li>Check for any new construction or improvements outside building envelope</li>
+                    <li>Monitor for dumped debris or waste materials</li>
+                    <li>Verify no clearcutting or large-scale timber operations</li>
+                    <li>Monitor posted signs for access restrictions compliance</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e1">
+                    <label for="e1">Reviewed baseline documentation prior to visit</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e2">
+                    <label for="e2">Contacted owner - discussed any changes or concerns</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e3">
+                    <label for="e3">Inspected wooden structure on pond for deterioration</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e4">
+                    <label for="e4">Assessed pond water quality and wildlife habitat</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e5">
+                    <label for="e5">Verified hay field is being maintained (active agricultural use)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e6">
+                    <label for="e6">Checked boundary markers and property limits</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e7">
+                    <label for="e7">Found no evidence of unauthorized structures or activities</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="e8">
+                    <label for="e8">Documented property condition with photos</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Grantee Approvals & Reserved Rights</h4>
+                <p><strong>ATC Approval Required Before:</strong> Any major forestry operations, dam modifications, significant ground disturbance, or removal of structures. Owner must submit plans and receive written approval from Appalachian Trail Conservancy before proceeding.</p>
+                <p><strong>Annual Permission Requests:</strong> Owners may seek annual approval for:
+                    <ul style="margin: 5px 0 0 20px; font-size: 13px;">
+                        <li>Timber harvesting plans</li>
+                        <li>Large excavation or grading projects</li>
+                        <li>Utility installation or easements</li>
+                        <li>Research or educational access</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template for this conservation easement property. Pay special attention to questions about structural changes and water feature conditions. Note any requested grantee approvals needed in coming year.</p>
+            </div>
+        </div>
+
+        <!-- LOT 66 - BARGER -->
+        <div id="prop-1" class="property-card">
+            <div class="property-header">
+                <h2>Lot 66 - Barger Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-66 | Recorded: 1-3-1986 | Liber 878, Page 292</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Contact through ATC</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>8.71 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Access</label>
+                    <p>Via private right-of-way through other easement parcels from NYS Rt. 9</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Land Composition</h3>
+                <ul>
+                    <li>50% meadow/open area around structures</li>
+                    <li>45% hardwood forest</li>
+                    <li>3% pasture</li>
+                    <li>2% buildings and foundation</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Structures & Features</h3>
+                <p><strong>Pre-existing (within New Building Envelope):</strong></p>
+                <ul>
+                    <li>Two barns</li>
+                    <li>Stone silo</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>NEW Since Easement (Post-2008 - REQUIRES MONITORING):</strong></p>
+                <ul>
+                    <li>Cement house foundation</li>
+                    <li>Dirt berms and excavations</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>Other Features:</strong></p>
+                <ul>
+                    <li>Post-and-wire fence around boundaries</li>
+                    <li>Plank fence near barn</li>
+                    <li>Plank fence with wire around pasture</li>
+                    <li>Stone walls</li>
+                    <li>Abandoned car (NEEDS REMOVAL)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Easement Restrictions & Violation Concerns</h3>
+                <div class="restriction-box">
+                    <p><strong>Restricted Area:</strong> 46.4% of property lies within Restricted Area</p>
+                    <p><strong>Building Envelope:</strong> Two barns and stone silo are pre-existing (allowed within "New Building Envelope" per deed)</p>
+                    <p><strong>PRIMARY ISSUE:</strong> NEW cement house foundation and associated excavations/dirt berms appear to be RECENT VIOLATIONS located partially in Restricted Area</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Permitted vs. Prohibited Activities</h3>
+                <div class="restriction-details">
+                    <h4>PRE-EXISTING & PERMITTED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Two barns (within New Building Envelope)</li>
+                        <li>Stone silo (within New Building Envelope)</li>
+                        <li>Limited pasture use (with fencing divided by property boundary - neighbor use acknowledged)</li>
+                        <li>Agricultural operations and hay cutting</li>
+                    </ul>
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Residential development:</strong> No new house sites or dwellings allowed</li>
+                        <li><strong>Major earth-moving:</strong> No excavation, grading, or dirt fill operations</li>
+                        <li><strong>Structures outside building envelope:</strong> House foundation and excavations NOT within permitted building envelope</li>
+                        <li><strong>Property debris:</strong> Abandoned vehicles/equipment must be removed</li>
+                        <li><strong>Subdivision:</strong> Property cannot be split</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert critical">
+                <h4>🚨 CRITICAL - POTENTIAL VIOLATIONS REQUIRING IMMEDIATE ATC REVIEW</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li><strong>★ House Foundation:</strong> NEW since easement execution - NOT within approved building envelope - LIKELY VIOLATION</li>
+                    <li><strong>★ Excavations & Dirt Berms:</strong> NEW grading/earth-moving in Restricted Area - LIKELY VIOLATION of deed restrictions</li>
+                    <li><strong>★ Abandoned Car:</strong> Must be removed - debris violation, environmental concern</li>
+                    <li><strong>Pasture Fence:</strong> Verify divided pasture use has owner approval and doesn't represent trespass</li>
+                    <li><strong>ACTION REQUIRED:</strong> Document with GPS coordinates, photos from multiple angles, measurements if possible. Report violations to ATC immediately.</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b1">
+                    <label for="b1">Reviewed baseline documentation and deed restrictions</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b2">
+                    <label for="b2">Located and photographed house foundation and excavations</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b3">
+                    <label for="b3">Assessed whether foundation/excavations fall within permitted building envelope</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b4">
+                    <label for="b4">Verified abandoned car location and condition for removal</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b5">
+                    <label for="b5">Inspected barns and silo for structural integrity</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b6">
+                    <label for="b6">Documented pasture use and fence configuration</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b7">
+                    <label for="b7">Checked boundary markers and fencing integrity</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="b8">
+                    <label for="b8">Photographed all structures and potential violations</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template. FLAG any violations discovered for immediate ATC review. Document all new structures with GPS coordinates and photographs.</p>
+            </div>
+        </div>
+
+        <!-- LOT 69 - HILPERT -->
+        <div id="prop-2" class="property-card">
+            <div class="property-header">
+                <h2>Lot 69 - Hilpert Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-69 | Recorded: 1-3-1986 | Liber 878, Page 292</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Beth Patton Hilpert<br/>Robert J. Hilpert</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <p>Hilpert-rhilpert@hilpertlaw.com<br/>2 Peacock Way, Garrison, NY 10524</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>43.03 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Frontage</label>
+                    <p>NYS Route 9 & Old Highland Turnpike</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Land Composition & Agricultural Status</h3>
+                <ul>
+                    <li>Mixture of meadow and woodland</li>
+                    <li>Certified in Agricultural District #1 (2003)</li>
+                    <li>Visible from Hudson Highlands State Park and Appalachian National Scenic Trail</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Ecological Significance</h3>
+                <div class="ownership-note">
+                    <strong>⚠️ Threatened Species Habitat:</strong> Fence lizard and timber rattlesnake (both NYS threatened species) documented within one mile of property. Monitor for habitat preservation.
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Easement Protection Notes</h3>
+                <p>Part of property also encumbered by National Park Service conservation easement. This is the largest contiguous parcel with public road frontage.</p>
+            </div>
+
+            <div class="alert">
+                <h4>🔍 Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>High visibility property - monitor for any unauthorized development or clearing</li>
+                    <li>Threatened species habitat protection</li>
+                    <li>Verify agricultural use is appropriate and permitted</li>
+                    <li>Check for any signage or access restrictions</li>
+                    <li>Monitor coordination with National Park Service easement holder</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h1">
+                    <label for="h1">Reviewed baseline documentation and deed restrictions</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h2">
+                    <label for="h2">Contacted owners - discussed any planned activities</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h3">
+                    <label for="h3">Assessed property visibility from public areas (Route 9, Appalachian Trail, State Park)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h4">
+                    <label for="h4">Checked for unauthorized clearing or land disturbance</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h5">
+                    <label for="h5">Verified agricultural activities are permitted and appropriate</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h6">
+                    <label for="h6">Noted any wildlife or threatened species observations</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h7">
+                    <label for="h7">Documented property condition with photos from public viewpoints</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="h8">
+                    <label for="h8">Verified property boundary integrity</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template. Document any wildlife observations or habitat concerns. Note any coordination with NPS easement monitoring.</p>
+            </div>
+        </div>
+
+        <!-- LOT 70 - KULLESEID 2 -->
+        <div id="prop-3" class="property-card">
+            <div class="property-header">
+                <h2>Lot 70 - Kulleseid Property (Parcel 1)</h2>
+                <div class="lot-info">Tax Parcel: 82-1-70 | Recorded: 11-7-1986 | Liber 918, Page 132</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Lars I. Kulleseid<br/>Margaret G. Kulleseid</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>19.00 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Access</label>
+                    <p>No public road frontage - via private right-of-way through other easement parcels from NYS Rt. 9</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Land Composition</h3>
+                <ul>
+                    <li>60% hardwood forest</li>
+                    <li>34% open meadows/hay field</li>
+                    <li>6% pond (Lake Alice)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Water Features & Structures</h3>
+                <ul>
+                    <li>Stone and cement dam on north end of Lake Alice pond</li>
+                    <li>Approximately 450 feet of small stream from pond outlet</li>
+                    <li>Stone walls</li>
+                    <li>Dirt laneways</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Easement Restrictions & Protected Values</h3>
+                <div class="restriction-box">
+                    <p><strong>Restricted Area:</strong> 74% of property lies within Restricted Area</p>
+                    <p><strong>Primary Protected Values:</strong> Lake Alice pond ecosystem, stream function and aquatic habitat, dam structure as water management feature, meadow habitat for wildlife</p>
+                    <p><strong>Easement Amendment:</strong> 12-22-2005 amendment refined restricted area boundaries</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Permitted vs. Prohibited Activities</h3>
+                <div class="restriction-details">
+                    <h4>PERMITTED (with care):</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Hay cutting:</strong> Annual agricultural use - maintains meadow habitat</li>
+                        <li><strong>Dam maintenance:</strong> Repairs necessary for water management and safety</li>
+                        <li><strong>Stream monitoring:</strong> Owner can assess water flow and quality</li>
+                        <li><strong>Trail maintenance:</strong> Foot paths and laneways for property access</li>
+                        <li><strong>Wildlife management:</strong> Reasonable habitat stewardship</li>
+                    </ul>
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Water extraction:</strong> No drawing water for commercial/intensive use</li>
+                        <li><strong>Pond draining:</strong> Cannot drain or significantly alter Lake Alice</li>
+                        <li><strong>Dam modification:</strong> No unauthorized changes to dam structure</li>
+                        <li><strong>Stream alteration:</strong> No channelization, damming, or water diversion downstream</li>
+                        <li><strong>Wetland filling:</strong> Cannot fill wetland areas</li>
+                        <li><strong>Pollution:</strong> No dumping or contamination of water resources</li>
+                        <li><strong>Clearcutting:</strong> No harvest that removes forest cover protection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert">
+                <h4>⚠️ Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li><strong>Dam Integrity:</strong> Inspect for cracks, erosion, seepage - critical infrastructure</li>
+                    <li><strong>Water Quality:</strong> Assess pond color, odor, algae - signs of pollution or overflow</li>
+                    <li><strong>Stream Function:</strong> Verify outlet flows - assess for blockages or unauthorized diversion</li>
+                    <li><strong>Hay Maintenance:</strong> Meadow should show evidence of annual cutting (or natural succession if allowed)</li>
+                    <li><strong>Boundary Compliance:</strong> Ensure no structures built near water features in restricted areas</li>
+                    <li><strong>Unauthorized Use:</strong> Check for signs of water extraction, flooding of downstream property</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k71">
+                    <label for="k71">Reviewed baseline documentation</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k72">
+                    <label for="k72">Inspected dam for structural damage or needed repairs</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k73">
+                    <label for="k73">Assessed stream outlet flow and water quality</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k74">
+                    <label for="k74">Checked Lake Alice water level and condition</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k75">
+                    <label for="k75">Verified hay field is being maintained</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k76">
+                    <label for="k76">Found no evidence of unauthorized water use</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k77">
+                    <label for="k77">Checked boundary markers and fencing</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k78">
+                    <label for="k78">Documented with photos</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template. Note any concerns about dam maintenance or water quality. Document stream conditions and wildlife observations.</p>
+            </div>
+        </div>
+
+        <!-- LOT 71 - KULLESEID 1 -->
+        <div id="prop-4" class="property-card">
+            <div class="property-header">
+                <h2>Lot 71 - Kulleseid Property (Parcel 2)</h2>
+                <div class="lot-info">Tax Parcel: 82-1-71 | Recorded: 11-7-1986 | Liber 918, Page 132</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Lars I. Kulleseid<br/>Margaret G. Kulleseid<br/>Erik Kulleseid</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact Info</label>
+                    <p>Phone: (845) 737-7137<br/>Email: erik.kulleseid@gmail.com<br/>larskulleseid@aol.com</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>15.38 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Access</label>
+                    <p>No public road frontage - via private right-of-way from NYS Rt. 9</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Land Composition</h3>
+                <ul>
+                    <li>78% hardwood forest</li>
+                    <li>22% open meadow/hay field</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Water Features & Structures</h3>
+                <ul>
+                    <li>Approximately 370 feet of small stream from nearby Lake Alice outlet</li>
+                    <li>Stone walls</li>
+                    <li>Dirt foot trails and laneways</li>
+                    <li>Posted signs</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Easement Restrictions & Conservation Values</h3>
+                <div class="restriction-box">
+                    <p><strong>Restricted Area:</strong> 52.7% of property lies within Restricted Area</p>
+                    <p><strong>Primary Protected Values:</strong> Hardwood forest ecosystem (78% of property), stream habitat and aquatic resources, wildlife corridors and connectivity to adjacent protected lands</p>
+                    <p><strong>Landowner Reserved Rights:</strong> Selective forestry (with limitations), hay cutting in meadows, recreational use, property maintenance</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Detailed Reserved Rights</h3>
+                <div class="restriction-details">
+                    <h4>OWNER RETAINS:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Selective Forestry:</strong> Individual tree harvesting for personal use only; must maintain 85% forest canopy coverage</li>
+                        <li><strong>Agricultural Use:</strong> Annual hay cutting in 22% meadow area - maintains wildlife habitat</li>
+                        <li><strong>Recreational Access:</strong> Full personal use including hiking, hunting (NYS-regulated), and fishing</li>
+                        <li><strong>Trail Maintenance:</strong> Upkeep of existing foot paths and laneways for property access</li>
+                        <li><strong>Wildlife Stewardship:</strong> Habitat management including invasive species removal and pruning for wildlife benefit</li>
+                        <li><strong>Stream Access:</strong> Full ownership of 370-foot stream section for observation and monitoring</li>
+                        <li><strong>Property Maintenance:</strong> Stone wall and boundary marker maintenance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Permitted vs. Prohibited Forestry Activities</h3>
+                <div class="restriction-details">
+                    <h4>PERMITTED (Selective/Limited):</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Selective timber harvesting:</strong> Individual tree removal for forest health/management</li>
+                        <li><strong>Dead/diseased tree removal:</strong> Clearing hazard trees and disease management</li>
+                        <li><strong>Invasive species control:</strong> Removal of non-native plants threatening native forest</li>
+                        <li><strong>Trail maintenance:</strong> Foot paths and laneways kept clear</li>
+                        <li><strong>Annual hay cutting:</strong> In open meadow areas only - maintains habitat</li>
+                        <li><strong>Wildlife management:</strong> Reasonable habitat maintenance (e.g., pruning for deer browse)</li>
+                    </ul>
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Clearcutting:</strong> Complete removal of forest stand - STRICTLY PROHIBITED</li>
+                        <li><strong>Commercial logging:</strong> No timber sales or commercial forestry operations</li>
+                        <li><strong>Conversion to non-forest:</strong> Cannot convert forest to pasture, crops, or developed use</li>
+                        <li><strong>Plantation conversion:</strong> Cannot replant with non-native species</li>
+                        <li><strong>Monoculture replacement:</strong> Cannot replace diverse forest with single species</li>
+                        <li><strong>Stream channelization:</strong> No alteration of 370-foot stream</li>
+                        <li><strong>Construction:</strong> No roads, buildings, or utilities in forest areas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert">
+                <h4>🌳 Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li><strong>Forest Cover:</strong> Verify tree canopy remains intact - no evidence of clearing</li>
+                    <li><strong>Timber Harvest Evidence:</strong> Look for stumps, cut trees, skidding trails - document size/scope</li>
+                    <li><strong>Stream Integrity:</strong> Check 370-foot stream flows naturally without diversion or blockage</li>
+                    <li><strong>Posted Signs:</strong> Verify boundary and access restriction signs are legible and intact</li>
+                    <li><strong>Invasive Species:</strong> Note if invasive plants are controlled or expanding</li>
+                    <li><strong>Wildlife Habitat:</strong> Assess evidence of game use (deer, turkey) and biodiversity</li>
+                    <li><strong>Meadow Use:</strong> Verify 22% meadow area is being actively managed or naturally maintained</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k51">
+                    <label for="k51">Reviewed baseline documentation</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k52">
+                    <label for="k52">Walked property perimeter to check for unauthorized cuts</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k53">
+                    <label for="k53">Assessed forest condition and tree health</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k54">
+                    <label for="k54">Verified stream outlet flow and water quality</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k55">
+                    <label for="k55">Checked posted signs are present and legible</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k56">
+                    <label for="k56">Verified meadow/hay field condition</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k57">
+                    <label for="k57">Checked boundary markers and stone walls</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="k58">
+                    <label for="k58">Documented with photos</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template. Focus on forestry observations and stream health. Note any wildlife or vegetation observations.</p>
+            </div>
+        </div>
+
+        <!-- LOT 72 - CLEMENTE -->
+        <div id="prop-5" class="property-card">
+            <div class="property-header">
+                <h2>Lot 72 - Clemente/Hill Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-72 | Recorded: 5-2-1986</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Michael Clemente</p>
+                </div>
+                <div class="info-item">
+                    <label>Location</label>
+                    <p>19 Twin Bridges Road<br/>Town of Philipstown, Putnam County, NY</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact Status</label>
+                    <p><strong>⚠️ No Contact Found</strong><br/>Contact ATC for current info</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Detailed Restrictions & Reserved Rights</h3>
+                <div class="restriction-details">
+                    <h4>OWNER RETAINS:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Residential Occupancy:</strong> Continued use of house and associated residential structures</li>
+                        <li><strong>Primary Building Footprint:</strong> Maintenance and repair of existing residential structure within defined building envelope</li>
+                        <li><strong>Utility Access:</strong> Maintenance of utilities serving residential use</li>
+                        <li><strong>Driveway Maintenance:</strong> Upkeep of existing driveway access</li>
+                        <li><strong>Residential Grounds:</strong> Landscaping and yard maintenance for residential use only</li>
+                    </ul>
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Expansion:</strong> No additions or enlargements to residential structure</li>
+                        <li><strong>New Structures:</strong> No accessory buildings, pools, or outbuildings outside existing envelope</li>
+                        <li><strong>Subdivision:</strong> Property cannot be divided or transferred in pieces</li>
+                        <li><strong>Commercial Use:</strong> No business operations or commercial activity</li>
+                        <li><strong>Multiple Dwellings:</strong> Property limited to single-family residential use</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Property Characteristics</h3>
+                <ul>
+                    <li>Residential property with house and associated improvements</li>
+                    <li>Driveway access</li>
+                </ul>
+            </div>
+
+            <div class="alert">
+                <h4>⚠️ Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Monitor building footprint - no unauthorized expansions</li>
+                    <li>Verify residential use only</li>
+                    <li>Check for boundary violations</li>
+                    <li>Document property condition</li>
+                </ul>
+            </div>
+
+            <div class="monitoring-checklist">
+                <h3>Seasonal Monitoring Checklist</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c1">
+                    <label for="c1">Reviewed baseline documentation</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c2">
+                    <label for="c2">Contacted owner - verified no planned improvements</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c3">
+                    <label for="c3">Assessed building footprint unchanged</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c4">
+                    <label for="c4">Checked for unauthorized structures or additions</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c5">
+                    <label for="c5">Verified boundary markers in place</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="c6">
+                    <label for="c6">Documented with photos</label>
+                </div>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Use Attached Monitoring Forms</h4>
+                <p>Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template. Focus on structural changes and boundary integrity.</p>
+            </div>
+        </div>
+
+        <!-- LOT 73 - CRISTIANO -->
+        <div id="prop-6" class="property-card">
+            <div class="property-header">
+                <h2>Lot 73 - Cristiano Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-73 | Recorded: 5-2-1986</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Salvatore & Rosemary Cristiano</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <p>Email: saltron@msn.com<br/>24 Twin Bridges Rd</p>
+                </div>
+                <div class="info-item">
+                    <label>Acreage</label>
+                    <p>16.09 acres</p>
+                </div>
+                <div class="info-item">
+                    <label>Location</label>
+                    <p>Town of Philipstown, Putnam County, NY</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Access Information</h3>
+                <div class="coordinates-display">
+                    <strong>Driveway Entrance Coordinates:</strong><br/>
+                    Latitude: N41 20.810 | Longitude: W73 55.713<br/>
+                    Magnetic Compass Direction: 340°<br/>
+                    <strong>Google Maps:</strong> <a href="https://maps.google.com/?q=41.347,-73.928" target="_blank" style="color: #667eea;">Open in Google Maps</a>
+                </div>
+            </div>
+
+            <div class="alert critical">
+                <h4>🚫 Important Access Restriction</h4>
+                <p>Access to this property was NOT granted for ground photography during baseline documentation. Property owner has restricted access. Contact ATC before attempting to access property for monitoring.</p>
+            </div>
+
+            <div class="section">
+                <h3>Detailed Restrictions</h3>
+                <div class="restriction-details">
+                    <h4>PROPERTY STATUS:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Restricted Area:</strong> Entire property lies within Restricted Area per survey</li>
+                        <li><strong>Limited Information:</strong> Baseline documentation incomplete due to access restrictions</li>
+                        <li><strong>Owner Coordination Required:</strong> All monitoring must be coordinated through ATC</li>
+                        <li><strong>Monitoring Access:</strong> Contact owner and ATC before each visit</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Monitoring Notes</h3>
+                <ul>
+                    <li>Property lies within Restricted Area per survey</li>
+                    <li>Restricted access requires ATC coordination</li>
+                    <li>May require remote monitoring or owner-granted access</li>
+                </ul>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Before Monitoring</h4>
+                <p><strong>CRITICAL:</strong> Contact ATC to arrange access and understand property owner's monitoring participation. Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template only after confirming access protocols with ATC.</p>
+            </div>
+        </div>
+
+        <!-- LOT 74 - CONNOLLY -->
+        <div id="prop-7" class="property-card">
+            <div class="property-header">
+                <h2>Lot 74 - Connolly/Fusco Property</h2>
+                <div class="lot-info">Tax Parcel: 82-1-74 | Location: Town of Philipstown, Putnam County, NY</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Current Owner</label>
+                    <p>Steven & Brittany Connolly</p>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <p>Email: StevenMConnolly@gmail.com</p>
+                </div>
+                <div class="info-item">
+                    <label>GPS Coordinates</label>
+                    <p>Central Property: N41 20.60<br/>W73 55.83</p>
+                </div>
+                <div class="info-item">
+                    <label>Map Access</label>
+                    <p><a href="https://maps.google.com/?q=41.343,-73.931" target="_blank" style="color: #667eea;">Open in Google Maps</a></p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Detailed Restrictions & Reserved Rights</h3>
+                <div class="restriction-details">
+                    <h4>OWNER RETAINS:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Residential Use:</strong> Continued occupancy of primary dwelling within building envelope</li>
+                        <li><strong>Building Maintenance:</strong> Repair and maintenance of structures within approved boundaries</li>
+                        <li><strong>Personal Recreation:</strong> Non-commercial recreation including hiking and property enjoyment</li>
+                        <li><strong>Utility Access:</strong> Continued maintenance of utilities serving residential use</li>
+                        <li><strong>Access Rights:</strong> Full access via existing driveway and interior roads</li>
+                    </ul>
+                    <h4>PROHIBITED:</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li><strong>Residential Expansion:</strong> No additions or new dwellings beyond existing building envelope</li>
+                        <li><strong>Commercial Development:</strong> No business operations or income-generating activities</li>
+                        <li><strong>Subdivision:</strong> Property cannot be divided or split</li>
+                        <li><strong>Major Earth Disturbance:</strong> No large-scale grading or excavation outside approved areas</li>
+                        <li><strong>Forest Conversion:</strong> No clearing of forested areas for development or agriculture</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="ownership-note">
+                <strong>Current Status:</strong> Ownership transferred from Fusco to Connolly. Steven & Brittany Connolly are current owners as of 2025.
+            </div>
+
+            <div class="alert">
+                <h4>⚠️ Key Monitoring Priorities</h4>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li><strong>PRIORITY:</strong> Verify current ownership status</li>
+                    <li>Confirm access and monitoring protocols with ATC</li>
+                    <li>Document any new ownership changes</li>
+                    <li>Assess property condition and potential issues</li>
+                </ul>
+            </div>
+
+            <div class="template-info">
+                <h4>📋 Before Monitoring</h4>
+                <p><strong>ACTION REQUIRED:</strong> Contact ATC to clarify current ownership and complete owner contact information. Confirm monitoring access protocols. Complete the "Year_Easement-Parcel-Name_ATC-Monitoring-Form" template after owner verification.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Osborne Farm Conservation Easement Monitoring Guide</strong></p>
+            <p>Appalachian Trail Conservancy | Town of Philipstown, Putnam County, NY</p>
+            <p style="margin-top: 10px; font-size: 11px;">Baseline Documentation Updated 2008 | This guide prepared for seasonal on-ground monitoring.</p>
+            <p style="margin-top: 5px; font-size: 11px;">Always carry: Property maps, GPS device, camera, baseline documentation, and contact information for property owners and ATC.</p>
+        </footer>
+    </div>
+
+    <script>
+        function switchProperty(index) {
+            // Hide all cards
+            const cards = document.querySelectorAll('.property-card');
+            cards.forEach(card => card.classList.remove('active'));
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected card
+            document.getElementById(`prop-${index}`).classList.add('active');
+            
+            // Activate selected tab
+            tabs[index].classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function copyPageLink() {
+            // Create a link to this page
+            const pageUrl = window.location.href;
+            navigator.clipboard.writeText(pageUrl).then(() => {
+                alert('Page link copied to clipboard! Share with: ' + pageUrl);
+            }).catch(err => {
+                alert('Link: ' + pageUrl + '\n\nCopy this to share with others');
+            });
+        }
+
+        function shareAsFile() {
+            // Get the current HTML and download as file
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Osborne_Farm_Monitoring_Guide.html';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
